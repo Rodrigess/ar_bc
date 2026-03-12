@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebAR - MindAR Image Tracking</title>
+  
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+      background-color: #000;
+    }
+    
+    /* Стили для стартового интерфейса */
+    #ui-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 9999; /* Поверх AR-сцены */
+    }
+
+    #start-button {
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s;
+    }
+
+    #start-button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Скрываем сцену до нажатия кнопки */
+    #ar-scene-container {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="ui-container">
+    <button id="start-button">Запустить камеру</button>
+  </div>
+
+  <div id="ar-scene-container">
+    <a-scene 
+      id="ar-scene"
+      mindar-image="imageTargetSrc: ./marker.mind; autoStart: false;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+      
+      <a-assets>
+        <a-asset-item id="avatarModel" src="./model.glb"></a-asset-item>
+      </a-assets>
+
+      <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
+      <a-light type="directional" color="#ffffff" intensity="0.8" position="1 2 1" castShadow="true"></a-light>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-gltf-model 
+          src="#avatarModel" 
+          position="0 0 0" 
+          scale="0.5 0.5 0.5" 
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+        </a-gltf-model>
+      </a-entity>
+
+    </a-scene>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const startButton = document.getElementById("start-button");
+      const uiContainer = document.getElementById("ui-container");
+      const sceneContainer = document.getElementById("ar-scene-container");
+      const arScene = document.getElementById("ar-scene");
+
+      startButton.addEventListener("click", () => {
+        // 1. Скрываем интерфейс с кнопкой
+        uiContainer.style.display = "none";
+        
+        // 2. Показываем контейнер со сценой
+        sceneContainer.style.display = "block";
+        
+        // 3. Запускаем систему MindAR
+        // Это инициирует запрос к камере и начнет трекинг
+        arScene.systems["mindar-image-system"].start();
+      });
+    });
+  </script>
+
+</body>
+</html>
