@@ -1,115 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebAR - MindAR Image Tracking</title>
-  
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phygital AR Project 2026</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: sans-serif;
-      background-color: #000;
-    }
-    
-    /* Стили для стартового интерфейса */
-    #ui-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: rgba(0, 0, 0, 0.8);
-      z-index: 9999; /* Поверх AR-сцены */
-    }
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        
+        /* Стили для кнопки старта */
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center;
+        }
+        button {
+            padding: 15px 30px; font-size: 18px; cursor: pointer;
+            background: #007bff; color: white; border: none; border-radius: 50px;
+            margin-top: 20px; transition: 0.3s;
+        }
+        button:hover { background: #0056b3; }
 
-    #start-button {
-      padding: 15px 30px;
-      font-size: 18px;
-      font-weight: bold;
-      color: white;
-      background-color: #007bff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s;
-    }
-
-    #start-button:hover {
-      background-color: #0056b3;
-    }
-
-    /* Скрываем сцену до нажатия кнопки */
-    #ar-scene-container {
-      display: none;
-    }
-  </style>
+        /* Блок аттрибуции (авторство) */
+        #attribution {
+            position: fixed; bottom: 10px; left: 10px; z-index: 1000;
+            background: rgba(0, 0, 0, 0.5); color: white; padding: 5px 12px;
+            border-radius: 4px; font-size: 12px; pointer-events: auto;
+            text-decoration: none; display: block;
+        }
+        #attribution a { color: #5bc0de; text-decoration: none; }
+    </style>
 </head>
 <body>
 
-  <div id="ui-container">
-    <button id="start-button">Запустить камеру</button>
-  </div>
+    <div id="start-screen">
+        <h2>Готовы к погружению?</h2>
+        <p>Разрешите доступ к камере и наведите её на плакат</p>
+        <button id="start-button">Запустить AR</button>
+    </div>
 
-  <div id="ar-scene-container">
-    <a-scene 
-      id="ar-scene"
-      mindar-image="imageTargetSrc: ./marker.mind; autoStart: false;" 
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
-      
-      <a-assets>
-        <a-asset-item id="avatarModel" src="./model.glb"></a-asset-item>
-      </a-assets>
+    <div id="attribution">
+        "Celeste winged strawberry" by <a href="https://sketchfab.com/Hugo.Benard" target="_blank">Author Name</a> / <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY</a>
+    </div>
 
-      <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
-      <a-light type="directional" color="#ffffff" intensity="0.8" position="1 2 1" castShadow="true"></a-light>
+    <a-scene mindar-image="imageTargetSrc: ./marker.mind; autoStart: false;" 
+             color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" 
+             vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        
+        <a-assets>
+            <a-asset-item id="myModel" src="./model.glb"></a-asset-item>
+        </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model 
-          src="#avatarModel" 
-          position="0 0 0" 
-          scale="0.5 0.5 0.5" 
-          animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-        </a-gltf-model>
-      </a-entity>
-
+        <a-entity mindar-image-target="targetIndex: 0">
+            <a-gltf-model src="#myModel"
+                          class="clickable"
+                          onclick="alert('Спасибо, что нажали на меня!')" 
+                          rotation="0 0 0" 
+                          position="0 0 0.5" 
+                          scale="1 1 1"
+                          animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+            </a-gltf-model>
+        </a-entity>
+        
+        <a-light type="directional" position="1 1 1"></a-light>
+        <a-light type="ambient" intensity="0.5"></a-light>
     </a-scene>
-  </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const startButton = document.getElementById("start-button");
-      const uiContainer = document.getElementById("ui-container");
-      const sceneContainer = document.getElementById("ar-scene-container");
-      const arScene = document.getElementById("ar-scene");
+    <script>
+        const startButton = document.querySelector('#start-button');
+        const startScreen = document.querySelector('#start-screen');
+        const sceneEl = document.querySelector('a-scene');
 
-      startButton.addEventListener("click", () => {
-        // 1. Скрываем интерфейс с кнопкой
-        uiContainer.style.display = "none";
-        
-        // 2. Показываем контейнер со сценой
-        sceneContainer.style.display = "block";
-        
-        // 3. Запускаем систему MindAR
-        // Это инициирует запрос к камере и начнет трекинг
-        arScene.systems["mindar-image-system"].start();
-      });
-    });
-  </script>
-
+        // Логика запуска сцены по нажатию кнопки
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            sceneEl.systems['mindar-image-system'].start(); // Запуск камеры и трекинга
+        });
+    </script>
 </body>
 </html>
